@@ -1,0 +1,131 @@
+
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>月齢カレンダー</title>
+</head><body>
+
+<header>
+<h1>月齢カレンダー <select id=selyear></select></h1>
+</header>
+
+<main id=main></main>
+
+<hr>
+<a href=https://github.com/code4fukui/mooncal/>src on GitHub</a><br>
+Lib: <a href=https://github.com/code4fukui/mooncal/>moon-age.js</a> forked from <a href=https://qiita.com/akebi_mh/items/b6a9c056d9198552e7b4>月齢と月の満ち欠けを表示 #JavaScript - Qiita</a><br>
+
+<style>
+body {
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  font-family: sans-serif;
+}
+header {
+  padding: 1em 0;
+  background-color: #ddd;
+  font-size: 160%;
+}
+#selyear {
+  font-size: 100%;
+  padding: .2em .5em;
+}
+calendar-view a {
+  text-decoration: none;
+  color: white;
+  -webkit-text-stroke: 2px #000 !important;
+  cursor: pointer;
+  display: block;
+  padding: .3em .1em .5em .1em;
+  x-background-color: red;
+}
+
+calendar-view > div {
+  vertical-align: top;
+}
+@media (min-width: 1100px) {
+  calendar-view > div {
+    display: inline-block;
+    width: 47vw;
+    margin: .5vw;
+  }
+  main {
+    font-size: 1vw;
+  }
+}
+calendar-view .days {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  margin: 0 0 .3em 0;
+}
+calendar-view .month {
+  font-size: 200%;
+  text-align: center;
+}
+calendar-view .days > div {
+  border: 1px solid gray;
+  x-text-align: center;
+  vertical-align: bottom;
+  text-align: right;
+  padding-right: .1em;
+  height: 2.3em;
+  font-size: 250%;
+  font-weight: bold;
+  color: white;
+  -webkit-text-stroke: 2px #000;
+}
+</style>
+
+<script type="module">
+import { Day } from "https://code4fukui.github.io/day-es/Day.js";
+import { CalendarView } from "https://code4fukui.github.io/calendar-view/calendar-view.js";
+import { MoonAge } from "./moon-age.js";
+
+const thisyear = new Date().getFullYear();
+for (let y = 2020; y < thisyear + 10; y++) {
+  const op = document.createElement("option");
+  op.textContent = y;
+  selyear.appendChild(op);
+}
+selyear.value = thisyear;
+
+const show = () => {
+  const year = selyear.value;
+  
+  main.innerHTML = "";
+  const cal = new CalendarView(year);
+  main.appendChild(cal);
+
+  for (let day = new Day(year + "-01-01"); day.year == year; day = day.dayAfter(1)) {
+    const div = cal.querySelector(".c" + day.toStringYMD());
+    if (div) {
+      const moonage = new MoonAge(50);
+      div.style.position = "relative";
+      moonage.style.position = "absolute";
+      moonage.style.top = "0px";
+      moonage.style.left = "0px";
+      moonage.style.zIndex = -1;
+      moonage.setDate(day.toString());
+      div.appendChild(moonage);
+      /*
+      //div.textContent = d.title;
+      div.style.backgroundImage = `url(${d.img})`;
+      div.style.backgroundRepeat = "no-repeat";
+      div.style.backgroundSize = "cover";
+      div.style.backgroundPosition = "center center";
+
+      div.innerHTML = `<a href=${d.url}>${div.textContent}</a>`;
+      div.setAttribute("title", d.title);
+      */
+    }
+  }
+  /*
+  for (const d of data) {
+    const dt = new Day(d.date).toStringYMD();
+  }
+  */
+};
+show();
+selyear.onchange = show;
+</script>
+
+</body>
